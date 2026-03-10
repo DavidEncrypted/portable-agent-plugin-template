@@ -81,7 +81,7 @@ Version-locked to a specific commit, reviewable in PRs, available to anyone
 who clones the repo.
 
 ```bash
-git submodule add https://github.com/DavidEncrypted/portable-agent-plugin-template.git vendor/agent-plugins
+git submodule add https://github.com/DavidEncrypted/portable-agent-plugin-template.git .agent-plugins/portable-agent-plugin-template
 git commit -m "add agent plugin submodule"
 ```
 
@@ -89,7 +89,7 @@ git commit -m "add agent plugin submodule"
 
 ```json
 {
-  "pluginMarketplaces": ["./vendor/agent-plugins"],
+  "pluginMarketplaces": ["./.agent-plugins/portable-agent-plugin-template"],
   "enabledPlugins": {
     "example-plugin@portable-agent-plugin-template": true
   }
@@ -102,14 +102,14 @@ plugin. Updates arrive via `git submodule update`.
 **Copilot CLI** -- after cloning:
 
 ```bash
-copilot plugin install ./vendor/agent-plugins/plugins/example-plugin
+copilot plugin install ./.agent-plugins/portable-agent-plugin-template/plugins/example-plugin
 ```
 
 After a submodule update, re-run the install. Alternatively, use
 `--plugin-dir` for direct loading (must be passed every launch):
 
 ```bash
-copilot --plugin-dir ./vendor/agent-plugins/plugins/example-plugin
+copilot --plugin-dir ./.agent-plugins/portable-agent-plugin-template/plugins/example-plugin
 ```
 
 ### Marketplace install (alternative)
