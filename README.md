@@ -131,6 +131,22 @@ claude plugin install example-plugin@portable-agent-plugin-template
 
 For private repos, git access needs to be configured (SSH keys or `gh auth`).
 
+To pick up new versions:
+
+**Claude Code** caches the marketplace repo locally. You need to refresh
+the cache before updating the plugin:
+
+```bash
+claude plugin marketplace update
+claude plugin update example-plugin@portable-agent-plugin-template
+```
+
+**Copilot CLI** fetches from remote directly:
+
+```bash
+copilot plugin update example-plugin
+```
+
 ### Tradeoffs
 
 | Concern | Git submodule | Marketplace install |
@@ -139,7 +155,7 @@ For private repos, git access needs to be configured (SSH keys or `gh auth`).
 | PR-reviewable changes | Yes | No |
 | Onboarding | Clone with `--recurse-submodules` | Run install once |
 | Works across all projects | Only where the submodule is added | Yes |
-| Updates | `git submodule update` | `plugin update` |
+| Updates | `git submodule update` | `marketplace update`, then `plugin update` |
 
 Both methods can coexist without conflicts. If the same skill name appears
 from multiple sources, the first loaded wins (project-level > personal > plugin).
