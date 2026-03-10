@@ -1,0 +1,15 @@
+{
+  "name": "example-plugin",
+  "description": "A minimal example plugin with one skill and one MCP server, for verifying your setup works.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Your Org"
+  },
+  "keywords": ["template", "example"],
+  "mcpServers": {
+    "echo-server": {
+      "command": "node",
+      "args": ["plugins/example-plugin/mcp-servers/echo-server.mjs"]
+    }
+  }
+}

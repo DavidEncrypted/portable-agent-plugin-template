@@ -1,0 +1,14 @@
+{
+  "name": "portable-agent-plugin-template",
+  "owner": {
+    "name": "Your Org",
+    "url": "https://github.com/your-org"
+  },
+  "plugins": [
+    {
+      "name": "example-plugin",
+      "description": "A minimal example plugin with one skill and one MCP server, for verifying your setup works.",
+      "source": "./plugins/example-plugin"
+    }
+  ]
+}
