@@ -156,19 +156,100 @@ If both work, the plugin loaded correctly.
 
 ## Adapting the template
 
-1. Replace `example-plugin` everywhere with your plugin name (kebab-case).
-2. Replace the `greeting` skill with your own. Each skill is a directory under
-   `skills/` containing a `SKILL.md` with YAML frontmatter (`name` and
-   `description`) followed by markdown instructions.
-3. Replace `echo-server.mjs` with your own MCP servers. Update the definitions
-   in both `.mcp.json` and `.github/plugin/plugin.json`.
-4. Update `name`, `description`, `author`, and `owner` in all three manifests.
-5. Use portable launchers for MCP server commands (`node`, `npx`, `uvx`,
-   `python`) -- no absolute paths.
+### How naming works
 
-To add more plugins later, create another directory under `plugins/` and add
-an entry to `marketplace.json`. They can be installed independently:
-`my-other-plugin@your-marketplace`.
+There are three names that matter and they connect like this:
+
+```
+claude plugin install <plugin-name>@<marketplace-name>
+```
+
+- **Marketplace name** -- the `name` field in `.claude-plugin/marketplace.json`.
+  This is also how the repo is identified when added as a marketplace. In this
+  template it is `portable-agent-plugin-template`.
+- **Plugin name** -- the `name` field in each plugin's
+  `.claude-plugin/plugin.json`, and the directory name under `plugins/`. These
+  must match. In this template it is `example-plugin`.
+- **Skill name** -- the `name` field in each `SKILL.md` frontmatter. Must be
+  unique across all installed plugins to avoid collisions.
+
+The `source` field in `marketplace.json` ties the marketplace to the plugin
+directory: `"source": "./plugins/example-plugin"`. This path is how Claude Code
+finds the plugin after resolving the marketplace.
+
+For Copilot CLI, the `.github/plugin/plugin.json` at the repo root acts as the
+entry point. Its `name` field should match the plugin name.
+
+### Renaming the plugin
+
+1. Rename the `plugins/example-plugin/` directory to `plugins/<your-name>/`.
+2. Update `name` in these files:
+   - `plugins/<your-name>/.claude-plugin/plugin.json`
+   - `.github/plugin/plugin.json`
+3. Update the `source` path and plugin `name` in `.claude-plugin/marketplace.json`.
+4. Update the marketplace `name` if you want a different marketplace identifier
+   (typically matches the repo name).
+
+### Writing skills
+
+Each skill is a directory under `plugins/<name>/skills/` containing a
+`SKILL.md` file. The format:
+
+```markdown
+---
+name: my-skill
+description: When and why the agent should use this skill. Be specific.
+---
+
+# Instructions
+
+The markdown body is loaded into the agent's context when the description
+matches the user's task. Write it as instructions the agent should follow.
+```
+
+The `description` field is what the agent uses to decide whether to load the
+skill, so make it concrete. "Use when deploying services" is better than
+"Deployment helper".
+
+You can add a `references/` subdirectory next to `SKILL.md` for supplementary
+docs that the skill instructions can point the agent to.
+
+### Adding MCP servers
+
+MCP server definitions need to go in two places:
+
+1. `plugins/<name>/.mcp.json` -- Claude Code reads this automatically.
+2. `.github/plugin/plugin.json` under `mcpServers` -- Copilot CLI needs them
+   inlined here.
+
+Both must define the same servers. Keep commands portable (`node`, `npx`,
+`uvx`, `python`) -- no absolute paths. If the server is a local script (like
+the included `echo-server.mjs`), use a relative path from where the file sits.
+
+Note that paths in `.mcp.json` are relative to the plugin directory, while
+paths in `.github/plugin/plugin.json` are relative to the repo root.
+
+### Adding more plugins to this repo
+
+Create another directory under `plugins/` and add an entry to
+`marketplace.json`:
+
+```json
+{
+  "plugins": [
+    {
+      "name": "example-plugin",
+      "source": "./plugins/example-plugin"
+    },
+    {
+      "name": "another-plugin",
+      "source": "./plugins/another-plugin"
+    }
+  ]
+}
+```
+
+They can be installed independently: `another-plugin@portable-agent-plugin-template`.
 
 ## Dual compatibility rules
 
