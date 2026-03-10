@@ -10,16 +10,15 @@ verify that the plugin installed correctly and both component types load.
 Located in `skills/greeting/SKILL.md`. Triggers when the user says hello. If the
 agent responds with the greeting message, the skill is loading correctly.
 
-### MCP server: echo-server
+### MCP server: time
 
-Located in `mcp-servers/echo-server.mjs`. Exposes a single `echo` tool that
-returns whatever string you pass it. If the agent can call the `echo` tool and
-get a response, MCP is working correctly.
+Uses `mcp-server-time` via uvx. Exposes `get_current_time` and `convert_time`
+tools. If the agent can tell you the current time, MCP is working correctly.
 
-Requires Node.js (no dependencies).
+Requires Python and uvx.
 
 ## Testing after install
 
 1. Start a session in Claude Code or Copilot CLI.
 2. Say "hello" -- the agent should respond with the greeting skill message.
-3. Ask the agent to use the `echo` tool with any string -- it should echo it back.
+3. Ask the agent what time it is -- it should use the `get_current_time` tool.

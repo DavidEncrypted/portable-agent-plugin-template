@@ -7,9 +7,9 @@
   },
   "keywords": ["template", "example"],
   "mcpServers": {
-    "echo-server": {
-      "command": "node",
-      "args": ["plugins/example-plugin/mcp-servers/echo-server.mjs"]
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
     }
   }
 }

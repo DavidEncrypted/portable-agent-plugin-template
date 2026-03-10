@@ -28,8 +28,8 @@ URL, so the same repo works for both distribution methods without changes.
 This template contains one example plugin with:
 
 - A `greeting` skill -- responds when you say hello (verifies skill loading).
-- An `echo` MCP server -- returns whatever you send it (verifies MCP loading).
-  Zero dependencies, runs with Node.js.
+- A `time` MCP server -- exposes `get_current_time` and `convert_time` tools
+  (verifies MCP loading). Uses `mcp-server-time` via uvx.
 
 Both exist only to confirm the install worked. Replace them with your own.
 
@@ -49,8 +49,6 @@ plugins/
     skills/
       greeting/
         SKILL.md
-    mcp-servers/
-      echo-server.mjs
     .mcp.json                   # MCP server definitions (Claude Code)
     README.md
 ```
@@ -150,7 +148,7 @@ from multiple sources, the first loaded wins (project-level > personal > plugin)
 
 1. Start a session in Claude Code or Copilot CLI.
 2. Say "hello" -- the agent should respond with the greeting skill message.
-3. Ask the agent to use the `echo` tool with any string -- it should echo it back.
+3. Ask the agent what time it is -- it should use the `get_current_time` tool.
 
 If both work, the plugin loaded correctly.
 
@@ -222,12 +220,9 @@ MCP server definitions need to go in two places:
 2. `.github/plugin/plugin.json` under `mcpServers` -- Copilot CLI needs them
    inlined here.
 
-Both must define the same servers. Keep commands portable (`node`, `npx`,
-`uvx`, `python`) -- no absolute paths. If the server is a local script (like
-the included `echo-server.mjs`), use a relative path from where the file sits.
-
-Note that paths in `.mcp.json` are relative to the plugin directory, while
-paths in `.github/plugin/plugin.json` are relative to the repo root.
+Both must define the same servers. Using package managers (`npx`, `uvx`) to
+reference published MCP servers is the simplest approach and works across
+all installation methods.
 
 ### Adding more plugins to this repo
 

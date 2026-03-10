@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "echo-server": {
-      "command": "node",
-      "args": ["mcp-servers/echo-server.mjs"]
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
     }
   }
 }
