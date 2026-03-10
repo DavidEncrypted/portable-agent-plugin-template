@@ -116,10 +116,10 @@ copilot --plugin-dir ./.agent-plugins/portable-agent-plugin-template/plugins/exa
 ```
 
 **GitHub Copilot in VS Code** -- the submodule method is not recommended.
-`chat.plugins.paths` and `chat.plugins.enabled` are user-level settings, so
-a workspace-committed config won't actually enable the plugin for other users.
-And because the path is relative to a specific workspace, it breaks when you
-open a different folder. Use the marketplace install instead (see below).
+Plugin settings are all user-level, so a workspace-committed config won't
+actually enable the plugin for other users. And because the path is relative
+to a specific workspace, it breaks when you open a different folder. Use
+the marketplace install instead (see below).
 
 ### Marketplace install (alternative)
 
@@ -140,21 +140,23 @@ claude plugin install example-plugin@portable-agent-plugin-template
 /plugin install example-plugin@portable-agent-plugin-template
 ```
 
-**GitHub Copilot in VS Code** -- add the marketplace to your **user-level**
-`settings.json` (not workspace settings):
+**GitHub Copilot in VS Code** -- agent plugins are still in preview (as of
+VS Code 1.110, February 2026). Three steps:
 
-```json
-{
-  "chat.plugins.marketplaces": [
-    "DavidEncrypted/portable-agent-plugin-template"
-  ]
-}
-```
+1. Enable `chat.plugins.enabled` in VS Code settings (off by default).
+2. Add the marketplace to your user-level `settings.json`:
+   ```json
+   {
+     "chat.plugins.marketplaces": [
+       "DavidEncrypted/portable-agent-plugin-template"
+     ]
+   }
+   ```
+3. Open the Extensions sidebar, type `@agentPlugins` in the search box (or
+   run `Chat: Plugins` from the Command Palette), and click Install.
 
-Then install from the Extensions sidebar: type `@agentPlugins` in the search
-box or run `Chat: Plugins` from the Command Palette. Browse the list and
-click Install. You can also manage installed plugins from the Chat view
-(gear icon > Plugins).
+Installed plugins can be managed from the Chat view (gear icon > Plugins).
+All settings are user-level -- see [VS Code caveats](#vs-code-caveats) below.
 
 For private repos, git access needs to be configured (SSH keys or `gh auth`).
 
@@ -309,8 +311,6 @@ Things to avoid if you want all three tools to work:
 GitHub Copilot's agent plugin support in VS Code is still in preview. A few
 things to be aware of:
 
-- **Enable the feature first.** Turn on `chat.plugins.enabled` in VS Code
-  settings. It is off by default.
 - **All plugin settings are user-level only.** `chat.plugins.marketplaces`,
   `chat.plugins.paths`, and `chat.plugins.enabled` must all go in your user
   settings, not workspace or dev container settings. This is why the
