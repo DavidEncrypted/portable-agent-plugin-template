@@ -115,20 +115,11 @@ After a submodule update, re-run the install. Alternatively, use
 copilot --plugin-dir ./.agent-plugins/portable-agent-plugin-template/plugins/example-plugin
 ```
 
-**GitHub Copilot in VS Code** -- add to your project's `.vscode/settings.json`
-and commit it:
-
-```json
-{
-  "chat.plugins.paths": {
-    "./.agent-plugins/portable-agent-plugin-template/plugins/example-plugin": true
-  }
-}
-```
-
-This makes the plugin auto-discoverable for anyone who opens the project in
-VS Code. Requires the `chat.plugins.enabled` setting to be turned on (it is
-still in preview as of VS Code 1.110, February 2026).
+**GitHub Copilot in VS Code** -- the submodule method is not recommended.
+`chat.plugins.paths` and `chat.plugins.enabled` are user-level settings, so
+a workspace-committed config won't actually enable the plugin for other users.
+And because the path is relative to a specific workspace, it breaks when you
+open a different folder. Use the marketplace install instead (see below).
 
 ### Marketplace install (alternative)
 
@@ -320,10 +311,11 @@ things to be aware of:
 
 - **Enable the feature first.** Turn on `chat.plugins.enabled` in VS Code
   settings. It is off by default.
-- **Marketplace config is user-level only.** The `chat.plugins.marketplaces`
-  setting must go in your user settings, not workspace or dev container
-  settings. The `chat.plugins.paths` setting for local directories does work
-  at the workspace level.
+- **All plugin settings are user-level only.** `chat.plugins.marketplaces`,
+  `chat.plugins.paths`, and `chat.plugins.enabled` must all go in your user
+  settings, not workspace or dev container settings. This is why the
+  submodule method is not recommended for VS Code -- there is no way to
+  commit a workspace config that enables the plugin for other users.
 - **Silent failures.** Mistakes in `marketplace.json` or `plugin.json` cause
   the marketplace feed to silently not appear. There is no error message.
   Test with Copilot CLI first since it gives better error output.
