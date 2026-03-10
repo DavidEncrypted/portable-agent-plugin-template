@@ -15,13 +15,15 @@ submodule because the expected directory structure does not allow it.
 ## The solution
 
 Wrap your skills and MCP servers in the plugin format. Plugins are the
-packaging unit that both Claude Code and Copilot CLI understand, and they
-have a directory structure that works as a standalone repo. This means you
-can store your plugins in a dedicated repo and pull them into projects as a
-git submodule, with versioning tied to the submodule commit.
+packaging unit that Claude Code, Copilot CLI, and GitHub Copilot in VS Code
+all understand,
+and they have a directory structure that works as a standalone repo. This
+means you can store your plugins in a dedicated repo and pull them into
+projects as a git submodule, with versioning tied to the submodule commit.
 
 The plugin format also supports marketplace-style installation from a repo
-URL, so the same repo works for both distribution methods without changes.
+URL, so the same repo works for all three tools and both distribution
+methods without changes.
 
 ## What is included
 
@@ -40,7 +42,7 @@ Both exist only to confirm the install worked. Replace them with your own.
   marketplace.json              # Registers repo as a marketplace (Claude Code)
 .github/
   plugin/
-    plugin.json                 # Direct plugin entry point (Copilot CLI)
+    plugin.json                 # Direct plugin entry point (Copilot CLI / VS Code)
                                 # MCP servers are inlined here
 plugins/
   example-plugin/
@@ -55,21 +57,24 @@ plugins/
 
 ### Why three manifests
 
-Claude Code and Copilot CLI discover plugins differently. Three files cover
-both tools:
+Claude Code, Copilot CLI, and GitHub Copilot in VS Code discover plugins
+differently. Three files cover all three tools:
 
 | File | Read by | Purpose |
 |------|---------|---------|
-| `.claude-plugin/marketplace.json` | Claude Code | Registers the repo as a marketplace; points to `./plugins/example-plugin` |
-| `.github/plugin/plugin.json` | Copilot CLI | Direct plugin entry point with MCP servers inlined |
+| `.claude-plugin/marketplace.json` | Claude Code, VS Code | Registers the repo as a marketplace; points to `./plugins/example-plugin` |
+| `.github/plugin/plugin.json` | Copilot CLI, VS Code | Direct plugin entry point with MCP servers inlined |
 | `plugins/example-plugin/.claude-plugin/plugin.json` | Claude Code (via marketplace) | The plugin manifest CC loads after resolving the marketplace path |
 
-Claude Code auto-discovers `.mcp.json` next to the plugin manifest, so MCP
-servers are not inlined there. Copilot CLI does not do this, so the root-level
-`.github/plugin/plugin.json` inlines them.
+VS Code reads both `.github/plugin/` and `.claude-plugin/` locations, so
+our layout with both is already covered.
 
-This is the cost of dual compatibility. If you only target one tool, you can
-drop the manifests for the other.
+Claude Code auto-discovers `.mcp.json` next to the plugin manifest, so MCP
+servers are not inlined there. Copilot CLI and VS Code do not do this, so
+the root-level `.github/plugin/plugin.json` inlines them.
+
+This is the cost of triple compatibility. If you only target one tool, you
+can drop the manifests for the others.
 
 ## Installation
 
@@ -110,6 +115,21 @@ After a submodule update, re-run the install. Alternatively, use
 copilot --plugin-dir ./.agent-plugins/portable-agent-plugin-template/plugins/example-plugin
 ```
 
+**GitHub Copilot in VS Code** -- add to your project's `.vscode/settings.json`
+and commit it:
+
+```json
+{
+  "chat.plugins.paths": {
+    "./.agent-plugins/portable-agent-plugin-template/plugins/example-plugin": true
+  }
+}
+```
+
+This makes the plugin auto-discoverable for anyone who opens the project in
+VS Code. Requires the `chat.plugins.enabled` setting to be turned on (it is
+still in preview as of VS Code 1.110, February 2026).
+
 ### Marketplace install (alternative)
 
 Better when you want the plugin available across all projects without adding
@@ -128,6 +148,22 @@ claude plugin install example-plugin@portable-agent-plugin-template
 /plugin marketplace add DavidEncrypted/portable-agent-plugin-template
 /plugin install example-plugin@portable-agent-plugin-template
 ```
+
+**GitHub Copilot in VS Code** -- add the marketplace to your **user-level**
+`settings.json` (not workspace settings):
+
+```json
+{
+  "chat.plugins.marketplaces": [
+    "DavidEncrypted/portable-agent-plugin-template"
+  ]
+}
+```
+
+Then install from the Extensions sidebar: type `@agentPlugins` in the search
+box or run `Chat: Plugins` from the Command Palette. Browse the list and
+click Install. You can also manage installed plugins from the Chat view
+(gear icon > Plugins).
 
 For private repos, git access needs to be configured (SSH keys or `gh auth`).
 
@@ -162,7 +198,7 @@ from multiple sources, the first loaded wins (project-level > personal > plugin)
 
 ## Verifying the install
 
-1. Start a session in Claude Code or Copilot CLI.
+1. Start a session in Claude Code, Copilot CLI, or VS Code with GitHub Copilot.
 2. Say "hello" -- the agent should respond with the greeting skill message.
 3. Ask the agent what time it is -- it should use the `get_current_time` tool.
 
@@ -262,19 +298,41 @@ Create another directory under `plugins/` and add an entry to
 
 They can be installed independently: `another-plugin@portable-agent-plugin-template`.
 
-## Dual compatibility rules
+## Cross-tool compatibility rules
 
 Skills and MCP servers are the two component types that work identically
-across Claude Code and Copilot CLI. Other types (commands, hooks, agents)
-have partial or no cross-tool support and are left out of this template.
+across Claude Code, Copilot CLI, and GitHub Copilot in VS Code. Other types
+(commands, hooks, agents) have partial or no cross-tool support and are left
+out of this template.
 
-Things to avoid if you want both tools to work:
+Things to avoid if you want all three tools to work:
 
 - `commands/` directory (Claude Code only)
 - `settings.json` at the plugin root (Claude Code only)
 - `${CLAUDE_PLUGIN_ROOT}` in paths (Claude Code only)
-- Skipping the manifest (Copilot CLI requires `plugin.json`)
+- Skipping the manifest (Copilot CLI and VS Code require `plugin.json`)
 - Hardcoded absolute paths
+
+### VS Code caveats
+
+GitHub Copilot's agent plugin support in VS Code is still in preview. A few
+things to be aware of:
+
+- **Enable the feature first.** Turn on `chat.plugins.enabled` in VS Code
+  settings. It is off by default.
+- **Marketplace config is user-level only.** The `chat.plugins.marketplaces`
+  setting must go in your user settings, not workspace or dev container
+  settings. The `chat.plugins.paths` setting for local directories does work
+  at the workspace level.
+- **Silent failures.** Mistakes in `marketplace.json` or `plugin.json` cause
+  the marketplace feed to silently not appear. There is no error message.
+  Test with Copilot CLI first since it gives better error output.
+- **Aggressive caching.** VS Code caches feed details aggressively. After
+  fixing a manifest, you may need to reload VS Code or toggle the marketplace
+  reference format (`owner/repo` vs full HTTPS URL) to force a refresh.
+- **Dev containers.** Don't register new marketplaces while using a dev
+  container. It currently tries to access local folder paths unavailable
+  inside the container.
 
 ## License
 
