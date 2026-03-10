@@ -1,8 +1,8 @@
 {
   "name": "portable-agent-plugin-template",
   "owner": {
-    "name": "Your Org",
-    "url": "https://github.com/your-org"
+    "name": "DavidEncrypted",
+    "url": "https://github.com/DavidEncrypted"
   },
   "plugins": [
     {

@@ -6,10 +6,10 @@ submodule (or installed from a marketplace).
 
 ## The problem
 
-You have internal skills and MCP servers that multiple repos need. Dropping
-them directly into each project's `.claude/` or equivalent folder means
-duplicated files, no single source of truth, and no clean way to version or
-update them. You cannot add a local skills folder from another repo as a
+You have skills and MCP servers that you want to reuse across multiple repos.
+Dropping them directly into each project's `.claude/` or equivalent folder
+means duplicated files, no single source of truth, and no clean way to version
+or update them. You cannot add a local skills folder from another repo as a
 submodule because the expected directory structure does not allow it.
 
 ## The solution
@@ -75,13 +75,13 @@ drop the manifests for the other.
 
 ## Installation
 
-### Git submodule (recommended for internal repos)
+### Git submodule (recommended)
 
-Version-locked to a specific commit, reviewable in PRs, automatically
-available to anyone who clones the repo.
+Version-locked to a specific commit, reviewable in PRs, available to anyone
+who clones the repo.
 
 ```bash
-git submodule add https://github.com/your-org/your-plugin-repo.git vendor/agent-plugins
+git submodule add https://github.com/DavidEncrypted/portable-agent-plugin-template.git vendor/agent-plugins
 git commit -m "add agent plugin submodule"
 ```
 
@@ -96,7 +96,7 @@ git commit -m "add agent plugin submodule"
 }
 ```
 
-Teammates who clone with `--recurse-submodules` get prompted to enable the
+Anyone who clones with `--recurse-submodules` gets prompted to enable the
 plugin. Updates arrive via `git submodule update`.
 
 **Copilot CLI** -- after cloning:
@@ -114,24 +114,24 @@ copilot --plugin-dir ./vendor/agent-plugins/plugins/example-plugin
 
 ### Marketplace install (alternative)
 
-Better for personal use or when you want the plugin available across all
-projects without adding a submodule to each.
+Better when you want the plugin available across all projects without adding
+a submodule to each.
 
 **Claude Code:**
 
 ```bash
-claude plugin marketplace add your-org/your-plugin-repo
+claude plugin marketplace add DavidEncrypted/portable-agent-plugin-template
 claude plugin install example-plugin@portable-agent-plugin-template
 ```
 
 **Copilot CLI:**
 
 ```bash
-/plugin marketplace add your-org/your-plugin-repo
+/plugin marketplace add DavidEncrypted/portable-agent-plugin-template
 /plugin install example-plugin@portable-agent-plugin-template
 ```
 
-For private repos, the user needs git access configured (SSH keys or `gh auth`).
+For private repos, git access needs to be configured (SSH keys or `gh auth`).
 
 ### Tradeoffs
 
@@ -139,7 +139,7 @@ For private repos, the user needs git access configured (SSH keys or `gh auth`).
 |---------|---------------|---------------------|
 | Version pinning | Pinned to submodule commit | Latest from marketplace |
 | PR-reviewable changes | Yes | No |
-| Onboarding | Clone with `--recurse-submodules` | Each user runs install once |
+| Onboarding | Clone with `--recurse-submodules` | Run install once |
 | Works across all projects | Only where the submodule is added | Yes |
 | Updates | `git submodule update` | `plugin update` |
 
@@ -167,7 +167,7 @@ If both work, the plugin loaded correctly.
    `python`) -- no absolute paths.
 
 To add more plugins later, create another directory under `plugins/` and add
-an entry to `marketplace.json`. Users install them independently:
+an entry to `marketplace.json`. They can be installed independently:
 `my-other-plugin@your-marketplace`.
 
 ## Dual compatibility rules
